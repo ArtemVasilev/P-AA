@@ -20,7 +20,7 @@ private:
     map<node*, node*> way;
     map<char, node*> pointers;
     multimap<char, pair<node*, node*>> toprint;
-    map<char, map<char, int>> sort;
+    map<char, map<char, int>> sorted;
     map<char, bool> viewed;
 
 public:
@@ -48,17 +48,16 @@ public:
         stock->value = vn;
         for (int k = 0; k < N; k++) {
             cin >> vi >> vj >> w;
-            sort[vi].insert(pair<char, int>(vj, w));
+            sorted[vi].insert(pair<char, int>(vj, w));
         }
-
-        for (auto it = sort.begin(); it != sort.end(); it++) {
-            if(!pointers[it->first]) pointers[it->first] = new node(it->first);
-            for (auto tr = it->second.begin() ; tr != it->second.end(); tr++) {
-                if(!pointers[tr->first]) pointers[tr->first] = new node(tr->first);
-                pointers[it->first]->neighbours[pointers[tr->first]] = pair<int, int>(tr->second, tr->second);
-                if(!pointers[tr->first]->neighbours[pointers[it->first]].first)
-                    pointers[tr->first]->neighbours[pointers[it->first]] = pair<int, int>(0, tr->second);
-                toprint.insert(pair<char, pair<node*, node*>>(pointers[it->first]->value, pair<node*, node*>(pointers[it->first], pointers[tr->first])));
+        for (auto &it : sorted){
+            if(!pointers[it.first]) pointers[it.first] = new node(it.first);
+            for(auto &tr : it.second){
+                if(!pointers[tr.first]) pointers[tr.first] = new node(tr.first);
+                    pointers[it.first]->neighbours[pointers[tr.first]] = pair<int, int>(tr.second, tr.second);
+                if(!pointers[tr.first]->neighbours[pointers[it.first]].first)
+                    pointers[tr.first]->neighbours[pointers[it.first]] = pair<int, int>(0, tr.second);
+                toprint.insert(pair<char, pair<node*, node*>>(pointers[it.first]->value, pair<node*, node*>(pointers[it.first], pointers[tr.first])));
             }
         }
     }
@@ -66,13 +65,14 @@ public:
     node* ws(char from){
         if(pointers[from] == stock) return stock;
         viewed[from] = true;
-        for (auto it = sort[from].begin(); it != sort[from].end(); it++) {
-            if(pointers[from]->neighbours[pointers[it->first]].first > 0 && viewed[it->first] == false){
-                node* to = ws(it->first);
+        for (auto &it : sorted[from]) {
+            if(pointers[from]->neighbours[pointers[it.first]].first > 0 && viewed[it.first] == false){
+                node* to = ws(it.first);
                 if(to != nullptr){
                     way[pointers[to->value]] = pointers[from];
                     return pointers[from];
                 }
+                else continue;
             }
         }
         return nullptr;
@@ -106,9 +106,8 @@ public:
     }
 
     void print(){
-        auto it = toprint.begin();
-        for (; it != toprint.end(); it++)
-            cout << it->first << " " << it->second.second->value << " "<< abs(it->second.first->neighbours[it->second.second].first - it->second.first->neighbours[it->second.second].second) << endl;
+        for (auto &it : toprint)
+            cout << it.first << " " << it.second.second->value << " " << abs(it.second.first->neighbours[it.second.second].first - it.second.first->neighbours[it.second.second].second) << endl;
     }
 };
 
