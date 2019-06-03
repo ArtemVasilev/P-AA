@@ -29,7 +29,7 @@ int * prefix(string s)
 
 int main()
 {
-    string p, t; //p-podstring
+    string p, t; 
     cin >> p;
     cin >> t;
     vector <size_t> find;
@@ -56,6 +56,8 @@ int main()
             cout << find[i] << ",";
         cout << find[find.size() - 1];
     }
+    
+    delete [] pi;
 
     return 0;
 }
