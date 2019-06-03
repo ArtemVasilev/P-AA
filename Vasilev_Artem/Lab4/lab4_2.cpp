@@ -54,6 +54,8 @@ int main()
 
     if(t.size()!=p.size()) cout << "-1";
     else cout << find;
+    
+    delete [] pi;
 
     return 0;
 }
